@@ -3,13 +3,14 @@ import { getFirestore, getDocs, collection } from 'firebase/firestore';
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-    apiKey: "AIzaSyCWInm3HhRxY4N7UWoQpO6Tp_rLXeDEt9E",
-    authDomain: "react-native-241ef.firebaseapp.com",
-    projectId: "react-native-241ef",
-    storageBucket: "react-native-241ef.appspot.com",
-    messagingSenderId: "818299508275",
-    appId: "1:818299508275:web:6f32039e9be32bb1237546"
-  };
+  apiKey: "AIzaSyBKbxnU_RkxBiQEs92vPFqu9bU3AEEhPPQ",
+  authDomain: "info6127-1146253-class.firebaseapp.com",
+  databaseURL: "https://info6127-1146253-class-default-rtdb.firebaseio.com",
+  projectId: "info6127-1146253-class",
+  storageBucket: "info6127-1146253-class.appspot.com",
+  messagingSenderId: "754130795212",
+  appId: "1:754130795212:web:1eecc43e84198450282069"
+};
   
   // Initialize Firebase
 export const db = initializeApp(firebaseConfig);
