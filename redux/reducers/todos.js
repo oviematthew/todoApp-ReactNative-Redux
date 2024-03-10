@@ -1,4 +1,4 @@
-import { ADD_TODO, DELETE_TODO, EDIT_TODO, CLEAR_TODO } from "../actionTypes";
+import { ADD_TODO, DELETE_TODO, EDIT_TODO} from "../actionTypes";
 
 const initialState = {
   todo_list: []
@@ -30,12 +30,6 @@ export default function(state = initialState, action) {
       };
     }
 
-      case CLEAR_TODO: {
-      return {
-        ...state,
-        todo_list: []
-      };
-    }
     default:
       return state;
   }

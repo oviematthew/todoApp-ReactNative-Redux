@@ -18,7 +18,7 @@ export const firestoreDb = getFirestore(db);
 export const dbCollection = collection(firestoreDb, 'tasks');
 
 
-// Read from db
+//read from db
 export function load() {
   const data = [];
   const loadedTaskIds = new Set();

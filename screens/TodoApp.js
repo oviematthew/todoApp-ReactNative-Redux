@@ -17,7 +17,7 @@ import { connect } from 'react-redux';
 import { addTodo, deleteTodo, editTodo } from '../redux/actions';
 
 // Import Firebase
-import { addDoc, deleteDoc, collection, doc } from 'firebase/firestore';
+import { addDoc, deleteDoc, updateDoc, doc } from 'firebase/firestore';
 import { firestoreDb, load } from '../components/database/config';
 import { dbCollection } from '../components/database/config';
 
@@ -27,8 +27,9 @@ import { dbCollection } from '../components/database/config';
 //   {id: 2, task: "Do another stuff"},
 // ]
 
-const TodoApp = ({ todo_list, addTodo, deleteTodo, editTodo }) => {
+const TodoApp = ({ addTodo, deleteTodo, editTodo }) => {
   const [task, setTask] = React.useState('');
+  const [tasks, setTasks] = React.useState([]);
   const [status, setStatus] = React.useState('due');
   const [selectedTodoId, setSelectedTodoId] = React.useState(null);
   const [editMode, setEditMode] = React.useState(false);
@@ -38,11 +39,8 @@ React.useEffect(() => {
   // Load tasks when the component mounts
   load()
     .then((loadedTasks) => {
-      console.log('Loaded tasks:', loadedTasks);
-      // Update the Redux store with the loaded tasks
-      loadedTasks.forEach((task) => {
-        addTodo(task);
-      });
+      // Update the state with the loaded tasks
+        setTasks(loadedTasks);
     })
     .catch((error) => {
       console.error('Error loading tasks:', error);
@@ -50,7 +48,7 @@ React.useEffect(() => {
 }, []);
 
 
- const handleAddTodo = async () => {
+  const handleAddTodo = async () => {
     try {
       const docRef = await addDoc(dbCollection, { task, status });
       const newTodo = {
@@ -59,29 +57,37 @@ React.useEffect(() => {
         status,
       };
       addTodo(newTodo);
+      setTasks([newTodo, ...tasks]);
       setTask('');
       setStatus('');
-      Alert.alert(
-        'Task Added',
-        'Task Added Successfully',
-        [{ text: 'OK' }]
-      );
+      Alert.alert('Task Added', 'Task Added Successfully', [{ text: 'OK' }]);
     } catch (error) {
       console.error('Error adding task:', error);
     }
   };
 
- const handleDeleteTodo = async (id) => {
+const handleDeleteTodo = async (id) => {
   try {
-    console.log('Deleting task with ID:', id);
-    const taskDocRef = doc(dbCollection, id);
-  
-    await deleteDoc(taskDocRef);
-    deleteTodo(id);
     Alert.alert(
-      'Task Deleted',
-      'Task Deleted Successfully',
-      [{ text: 'OK' }]
+      'Confirm Deletion',
+      'Are you sure you want to delete this task?',
+      [
+        {
+          text: 'No',
+          style: 'cancel',
+        },
+        {
+          text: 'Yes',
+          onPress: async () => {
+            const taskDocRef = doc(firestoreDb, 'tasks', id);
+            await deleteDoc(taskDocRef);
+            deleteTodo(id);
+            setTasks(tasks.filter((task) => task.id !== id));
+            Alert.alert('Task Deleted', 'Task Deleted Successfully', [{ text: 'OK' }]);
+          },
+        },
+      ],
+      { cancelable: false }
     );
   } catch (error) {
     console.error('Error deleting task:', error);
@@ -90,35 +96,30 @@ React.useEffect(() => {
 
 
 
-  const handleEditTodo = async () => {
-  if (selectedTodoId !== null) {
-    try {
-      const taskDocRef = doc(dbCollection, selectedTodoId);
-      await updateDoc(taskDocRef, { task, status });
-      const updatedToDo = {
-      id: taskDocRef.id,
-      task,
-      status
-    }
-      // Update the Redux state after successfully updating the Firestore document
-      editTodo(updatedToDo);
 
-      // Reset form fields and selectedTodoId
+  const handleEditTodo = async () => {
+    
+    if (selectedTodoId !== null) {
+       // Update Firebase
+      const taskDocRef = doc(firestoreDb, 'tasks', selectedTodoId);
+      await updateDoc(taskDocRef, { task, status });
+
+      
+
+      // Update Redux store
+      editTodo(selectedTodoId, task, status);
+
+      // Update local state to trigger re-render
+      const updatedTasks = tasks.map((item) =>
+        item.id === selectedTodoId ? { ...item, task, status } : item
+      );
+      setTasks(updatedTasks);
+
       setTask('');
       setSelectedTodoId(null);
       setEditMode(false);
-
-      Alert.alert(
-        'Task Updated',
-        'Task Updated Successfully',
-        [{ text: 'OK' }]
-      );
-    } catch (error) {
-      console.error('Error updating task:', error);
     }
-  }
-};
-
+  };
 
   const handleEditPress = (id, currentTask, currentStatus) => {
     setTask(currentTask);
@@ -182,7 +183,7 @@ React.useEffect(() => {
       <Spacer />
 
       <ScrollView>
-      {todo_list.map((item) => (
+      {tasks.map((item, index) => (
         <React.Fragment key={item.id}>
           <TouchableOpacity onPress={() => handleCardPress(item.id, item.task, item.status)}>
             <Card
@@ -192,7 +193,7 @@ React.useEffect(() => {
                 borderColor: '#000',
               }}>
               <Card.Title
-                title={`Task#${item.id}`}
+                title={`Task#${index +1}`}
                 left={(props) => <Icon name="tasks" size={24} color="black" />}
                 right={(props) => (
                   <ButtonIcon
