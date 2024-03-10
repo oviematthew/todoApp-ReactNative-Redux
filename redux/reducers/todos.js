@@ -1,4 +1,4 @@
-import { ADD_TODO, DELETE_TODO, EDIT_TODO } from "../actionTypes";
+import { ADD_TODO, DELETE_TODO, EDIT_TODO, CLEAR_TODO } from "../actionTypes";
 
 const initialState = {
   todo_list: []
@@ -27,6 +27,13 @@ export default function(state = initialState, action) {
         todo_list: state.todo_list.map((todo) =>
           todo.id === id ? { ...todo, task, status } : todo
         )
+      };
+    }
+
+      case CLEAR_TODO: {
+      return {
+        ...state,
+        todo_list: []
       };
     }
     default:

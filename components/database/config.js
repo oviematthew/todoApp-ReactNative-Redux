@@ -18,9 +18,10 @@ export const firestoreDb = getFirestore(db);
 export const dbCollection = collection(firestoreDb, 'tasks');
 
 
-//read from db
+// Read from db
 export function load() {
   const data = [];
+  const loadedTaskIds = new Set();
 
   return new Promise((resolve, reject) => {
     getDocs(dbCollection)
@@ -30,8 +31,14 @@ export function load() {
             ...doc.data(),
             id: doc.id
           };
-          data.push(task);
+
+          // Check if the task with the same ID has already been loaded
+          if (!loadedTaskIds.has(task.id)) {
+            data.push(task);
+            loadedTaskIds.add(task.id);
+          }
         });
+
         resolve(data);
       })
       .catch((error) => {

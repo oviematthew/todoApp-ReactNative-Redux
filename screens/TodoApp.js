@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Text, View, StyleSheet, TouchableOpacity, ScrollView} from 'react-native';
+import {Text, View, StyleSheet, TouchableOpacity, Alert, ScrollView} from 'react-native';
 import Constants from 'expo-constants';
 
 // You can import from local files
@@ -16,6 +16,11 @@ import RNPickerSelect from 'react-native-picker-select';
 import { connect } from 'react-redux';
 import { addTodo, deleteTodo, editTodo } from '../redux/actions';
 
+// Import Firebase
+import { addDoc, deleteDoc, collection, doc } from 'firebase/firestore';
+import { firestoreDb, load } from '../components/database/config';
+import { dbCollection } from '../components/database/config';
+
 // Test Data
 // const data = [
 //   {id: 1, task: "Do this stuff"},
@@ -28,24 +33,92 @@ const TodoApp = ({ todo_list, addTodo, deleteTodo, editTodo }) => {
   const [selectedTodoId, setSelectedTodoId] = React.useState(null);
   const [editMode, setEditMode] = React.useState(false);
 
-  const handleAddTodo = () => {
-    addTodo({ task, status });
-    setTask('');
-    setStatus('due');
+
+React.useEffect(() => {
+  // Load tasks when the component mounts
+  load()
+    .then((loadedTasks) => {
+      console.log('Loaded tasks:', loadedTasks);
+      // Update the Redux store with the loaded tasks
+      loadedTasks.forEach((task) => {
+        addTodo(task);
+      });
+    })
+    .catch((error) => {
+      console.error('Error loading tasks:', error);
+    });
+}, []);
+
+
+ const handleAddTodo = async () => {
+    try {
+      const docRef = await addDoc(dbCollection, { task, status });
+      const newTodo = {
+        id: docRef.id,
+        task,
+        status,
+      };
+      addTodo(newTodo);
+      setTask('');
+      setStatus('');
+      Alert.alert(
+        'Task Added',
+        'Task Added Successfully',
+        [{ text: 'OK' }]
+      );
+    } catch (error) {
+      console.error('Error adding task:', error);
+    }
   };
 
-  const handleDeleteTodo = (id) => {
+ const handleDeleteTodo = async (id) => {
+  try {
+    console.log('Deleting task with ID:', id);
+    const taskDocRef = doc(dbCollection, id);
+  
+    await deleteDoc(taskDocRef);
     deleteTodo(id);
-  };
+    Alert.alert(
+      'Task Deleted',
+      'Task Deleted Successfully',
+      [{ text: 'OK' }]
+    );
+  } catch (error) {
+    console.error('Error deleting task:', error);
+  }
+};
 
-  const handleEditTodo = () => {
-    if (selectedTodoId !== null) {
-      editTodo(selectedTodoId, task, status);
+
+
+  const handleEditTodo = async () => {
+  if (selectedTodoId !== null) {
+    try {
+      const taskDocRef = doc(dbCollection, selectedTodoId);
+      await updateDoc(taskDocRef, { task, status });
+      const updatedToDo = {
+      id: taskDocRef.id,
+      task,
+      status
+    }
+      // Update the Redux state after successfully updating the Firestore document
+      editTodo(updatedToDo);
+
+      // Reset form fields and selectedTodoId
       setTask('');
       setSelectedTodoId(null);
       setEditMode(false);
+
+      Alert.alert(
+        'Task Updated',
+        'Task Updated Successfully',
+        [{ text: 'OK' }]
+      );
+    } catch (error) {
+      console.error('Error updating task:', error);
     }
-  };
+  }
+};
+
 
   const handleEditPress = (id, currentTask, currentStatus) => {
     setTask(currentTask);

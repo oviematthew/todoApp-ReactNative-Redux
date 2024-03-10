@@ -12,6 +12,7 @@
     "@reduxjs/toolkit": "^2.1.0",
     "expo": "^50.0.6",
     "expo-status-bar": "~1.11.1",
+    "firebase": "^10.8.1",
     "react": "^18.2.0",
     "react-native": "^0.73.2",
     "react-native-paper": "^5.12.3",
