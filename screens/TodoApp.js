@@ -141,7 +141,7 @@ const handleDeleteTodo = async (id) => {
     <View style={styles.container}>
       <Card title="Card Title">
         <Text style={styles.paragraph}>
-          ToDo App with React Native and Redux
+          ToDo App with React Native, Firebase Firestore and Redux Toolkit
         </Text>
       </Card>
       <Spacer />
