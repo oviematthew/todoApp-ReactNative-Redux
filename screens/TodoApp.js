@@ -17,14 +17,8 @@ import { addTodo, deleteTodo, editTodo } from '../redux/actions';
 
 // Import Firebase
 import { addDoc, deleteDoc, updateDoc, doc } from 'firebase/firestore';
-import { firestoreDb, load } from '../components/database/config';
-import { dbCollection } from '../components/database/config';
+import { load, dbCollection } from '../components/database/config';
 
-// Test Data
-// const data = [
-//   {id: 1, task: "Do this stuff"},
-//   {id: 2, task: "Do another stuff"},
-// ]
 
 const TodoApp = ({ addTodo, deleteTodo, editTodo }) => {
   const [task, setTask] = React.useState('');
@@ -78,7 +72,7 @@ const handleDeleteTodo = async (id) => {
         {
           text: 'Yes',
           onPress: async () => {
-            const taskDocRef = doc(firestoreDb, 'tasks', id);
+            const taskDocRef = doc(dbCollection, id);
             await deleteDoc(taskDocRef);
 
             deleteTodo(id);
@@ -104,10 +98,8 @@ const handleDeleteTodo = async (id) => {
     
     if (selectedTodoId !== null) {
        // Update Firebase
-      const taskDocRef = doc(firestoreDb, 'tasks', selectedTodoId);
+      const taskDocRef = doc(dbCollection, selectedTodoId);
       await updateDoc(taskDocRef, { task, status });
-
-      
 
       // Update Redux store
       editTodo(selectedTodoId, task, status);
@@ -118,12 +110,14 @@ const handleDeleteTodo = async (id) => {
       );
       setTasks(updatedTasks);
 
+      // reset task title, todoId, and edit mode
       setTask('');
       setSelectedTodoId(null);
       setEditMode(false);
     }
   };
 
+  // handle edit mode
   const handleEditPress = (id, currentTask, currentStatus) => {
     setTask(currentTask);
     setStatus(currentStatus);
@@ -131,6 +125,7 @@ const handleDeleteTodo = async (id) => {
     setEditMode(true);
   };
 
+  //handle card click
   const handleCardPress = (id, currentTask, currentStatus) => {
     if (!editMode) {
       handleEditPress(id, currentTask, currentStatus);
