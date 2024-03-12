@@ -1,6 +1,6 @@
 # ToDO APP With React Native, Redux Toolkit & Firebase Firestore
 
-## This is an updated version of my older <a href ="https://github.com/oviematthew/todo-app">app</a>, this time using redux toolkit
+## This is an updated version of my older <a href ="https://github.com/oviematthew/todo-app">app</a>, which i redesigned, this time using redux toolkit.
 
 ## Screenshots
 
