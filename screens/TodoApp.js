@@ -11,7 +11,6 @@ import { Title, Paragraph, Card, Button, TextInput } from 'react-native-paper';
 import { FontAwesome as Icon } from '@expo/vector-icons';
 import RNPickerSelect from 'react-native-picker-select';
 
-
 // Import Redux and React Redux Dependencies
 import { connect } from 'react-redux';
 import { addTodo, deleteTodo, editTodo } from '../redux/actions';
