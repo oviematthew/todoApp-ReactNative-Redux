@@ -1,4 +1,4 @@
-import { ADD_TODO, DELETE_TODO, EDIT_TODO, CLEAR_TODO } from "./actionTypes";
+import { ADD_TODO, DELETE_TODO, EDIT_TODO } from "./actionTypes";
 
 let nextTodoId = 0;
 

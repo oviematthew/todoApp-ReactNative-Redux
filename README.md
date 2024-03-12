@@ -1,6 +1,4 @@
-# ToDO APP With React Native & Redux Toolkit
-
-## Using useState, this app allows modification of added tasks to change header and status
+# ToDO APP With React Native, Redux Toolkit & Firebase Firestore
 
 ## Screenshots
 

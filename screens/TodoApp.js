@@ -81,10 +81,14 @@ const handleDeleteTodo = async (id) => {
           onPress: async () => {
             const taskDocRef = doc(firestoreDb, 'tasks', id);
             await deleteDoc(taskDocRef);
+
             deleteTodo(id);
+
             setTasks(tasks.filter((task) => task.id !== id));
+
             Alert.alert('Task Deleted', 'Task Deleted Successfully', [{ text: 'OK' }]);
           },
+          style: 'default'
         },
       ],
       { cancelable: false }
